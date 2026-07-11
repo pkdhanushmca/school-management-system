@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: school-management-system
+  datasource:
+    url: jdbc:postgresql://localhost:5432/educore_db
+    username: postgres
+    password: "Educore@123"
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
