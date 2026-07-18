@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/educore_db
     username: postgres
-    password: "Educore@123"
+    password: postgres123
   jpa:
     hibernate:
       ddl-auto: update
