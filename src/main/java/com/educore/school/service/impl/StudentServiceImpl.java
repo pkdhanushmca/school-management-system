@@ -3,6 +3,8 @@ package com.educore.school.service.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.educore.school.dto.request.StudentRequestDto;
@@ -61,9 +63,9 @@ public class StudentServiceImpl implements StudentService {
 
 		Student student = studentRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Student not found with id : " + id));
-		
+
 		if (student.getStatus() == StudentStatus.INACTIVE) {
-		    throw new ResourceNotFoundException("Student not found with id : " + id);
+			throw new ResourceNotFoundException("Student not found with id : " + id);
 		}
 
 		return studentMapper.toResponse(student);
@@ -100,6 +102,23 @@ public class StudentServiceImpl implements StudentService {
 		student.setStatus(StudentStatus.INACTIVE);
 
 		studentRepository.save(student);
+	}
+
+	@Override
+	public Page<StudentResponseDto> getAllStudents(Pageable pageable) {
+
+		Page<Student> students = studentRepository.findByStatus(StudentStatus.ACTIVE, pageable);
+
+		return students.map(studentMapper::toResponse);
+	}
+
+	@Override
+	public Page<StudentResponseDto> searchStudents(String keyword, Pageable pageable) {
+
+		Page<Student> students = studentRepository.findByStatusAndFirstNameContainingIgnoreCase(StudentStatus.ACTIVE,
+				keyword, pageable);
+
+		return students.map(studentMapper::toResponse);
 	}
 
 }
