@@ -54,4 +54,33 @@ public class StudentMapper {
 
 		return response;
 	}
+	
+	public void updateEntity(Student student, StudentRequestDto request) {
+
+	    student.setFirstName(request.getFirstName());
+	    student.setLastName(request.getLastName());
+	    student.setDateOfBirth(request.getDateOfBirth());
+	    student.setGender(request.getGender());
+	    student.setBloodGroup(request.getBloodGroup());
+	    student.setEmail(request.getEmail());
+	    student.setStudentMobile(request.getStudentMobile());
+
+	    student.setFatherName(request.getFatherName());
+	    student.setFatherOccupation(request.getFatherOccupation());
+	    student.setMotherName(request.getMotherName());
+	    student.setMotherOccupation(request.getMotherOccupation());
+
+	    student.setParentMobile(request.getParentMobile());
+	    student.setParentEmail(request.getParentEmail());
+
+	    student.setDoorNo(request.getDoorNo());
+	    student.setStreet(request.getStreet());
+	    student.setCity(request.getCity());
+	    student.setDistrict(request.getDistrict());
+	    student.setState(request.getState());
+	    student.setPincode(request.getPincode());
+
+	    student.setPreviousSchool(request.getPreviousSchool());
+	    student.setAdmissionDate(request.getAdmissionDate());
+	}
 }

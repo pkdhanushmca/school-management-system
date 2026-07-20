@@ -1,5 +1,8 @@
 package com.educore.school.service.impl;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import com.educore.school.dto.request.StudentRequestDto;
@@ -7,6 +10,7 @@ import com.educore.school.dto.response.StudentResponseDto;
 import com.educore.school.entity.Student;
 import com.educore.school.enums.StudentStatus;
 import com.educore.school.exception.DuplicateResourceException;
+import com.educore.school.exception.ResourceNotFoundException;
 import com.educore.school.mapper.StudentMapper;
 import com.educore.school.repository.StudentRepository;
 import com.educore.school.service.StudentService;
@@ -39,11 +43,63 @@ public class StudentServiceImpl implements StudentService {
 
 		// Generate Admission Number
 		savedStudent.setAdmissionNumber(AdmissionNumberGenerator.generate(savedStudent.getId()));
-		
+
 		// Update
 		savedStudent = studentRepository.save(savedStudent);
 
 		return studentMapper.toResponse(savedStudent);
 	}
-	
+
+	@Override
+	public List<StudentResponseDto> getAllStudents() {
+
+		return studentRepository.findByStatus(StudentStatus.ACTIVE).stream().map(studentMapper::toResponse).toList();
+	}
+
+	@Override
+	public StudentResponseDto getStudentById(Long id) {
+
+		Student student = studentRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Student not found with id : " + id));
+		
+		if (student.getStatus() == StudentStatus.INACTIVE) {
+		    throw new ResourceNotFoundException("Student not found with id : " + id);
+		}
+
+		return studentMapper.toResponse(student);
+	}
+
+	@Override
+	public StudentResponseDto updateStudent(Long id, StudentRequestDto request) {
+
+		Student student = studentRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Student not found with id : " + id));
+
+		if (request.getEmail() != null && studentRepository.existsByEmailAndIdNot(request.getEmail(), id)) {
+
+			throw new DuplicateResourceException("Email already exists");
+		}
+
+		studentMapper.updateEntity(student, request);
+
+		Student savedStudent = studentRepository.save(student);
+
+		return studentMapper.toResponse(savedStudent);
+	}
+
+	@Override
+	public void deleteStudent(Long id) {
+
+		Student student = studentRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Student not found with id : " + id));
+
+		if (student.getStatus() == StudentStatus.INACTIVE) {
+			throw new DuplicateResourceException("Student is already inactive");
+		}
+
+		student.setStatus(StudentStatus.INACTIVE);
+
+		studentRepository.save(student);
+	}
+
 }
