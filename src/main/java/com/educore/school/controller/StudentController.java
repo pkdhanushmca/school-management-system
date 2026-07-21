@@ -22,6 +22,7 @@ import com.educore.school.dto.ApiResponse;
 import com.educore.school.dto.request.StudentRequestDto;
 import com.educore.school.dto.response.StudentResponseDto;
 import com.educore.school.service.StudentService;
+import com.educore.school.specification.StudentFilterDto;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,17 +43,6 @@ public class StudentController {
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
 	}
-
-//	@GetMapping
-//	public ResponseEntity<ApiResponse<List<StudentResponseDto>>> getAllStudents() {
-//
-//		List<StudentResponseDto> students = studentService.getAllStudents();
-//
-//		ApiResponse<List<StudentResponseDto>> response = new ApiResponse<>(true, "Students retrieved successfully",
-//				students);
-//
-//		return ResponseEntity.ok(response);
-//	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<ApiResponse<StudentResponseDto>> getStudentById(@PathVariable Long id) {
@@ -117,6 +107,24 @@ public class StudentController {
 		Page<StudentResponseDto> response = studentService.searchStudents(keyword, pageable);
 
 		ApiResponse<Page<StudentResponseDto>> apiResponse = new ApiResponse<>(true, "Students retrieved successfully",
+				response);
+
+		return ResponseEntity.ok(apiResponse);
+	}
+
+	@PostMapping("/filter")
+	public ResponseEntity<ApiResponse<Page<StudentResponseDto>>> filterStudents(@RequestBody StudentFilterDto filter,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
+			@RequestParam(defaultValue = "firstName") String sortBy,
+			@RequestParam(defaultValue = "asc") String direction) {
+
+		Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+		Pageable pageable = PageRequest.of(page, size, sort);
+
+		Page<StudentResponseDto> response = studentService.filterStudents(filter, pageable);
+
+		ApiResponse<Page<StudentResponseDto>> apiResponse = new ApiResponse<>(true, "Students filtered successfully",
 				response);
 
 		return ResponseEntity.ok(apiResponse);

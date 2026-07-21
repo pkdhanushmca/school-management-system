@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.educore.school.dto.request.StudentRequestDto;
@@ -16,6 +17,8 @@ import com.educore.school.exception.ResourceNotFoundException;
 import com.educore.school.mapper.StudentMapper;
 import com.educore.school.repository.StudentRepository;
 import com.educore.school.service.StudentService;
+import com.educore.school.specification.StudentFilterDto;
+import com.educore.school.specification.StudentSpecification;
 import com.educore.school.util.AdmissionNumberGenerator;
 
 import jakarta.transaction.Transactional;
@@ -117,6 +120,18 @@ public class StudentServiceImpl implements StudentService {
 
 		Page<Student> students = studentRepository.findByStatusAndFirstNameContainingIgnoreCase(StudentStatus.ACTIVE,
 				keyword, pageable);
+
+		return students.map(studentMapper::toResponse);
+	}
+
+	@Override
+	public Page<StudentResponseDto> filterStudents(StudentFilterDto filter, Pageable pageable) {
+		Specification<Student> specification = Specification.where(StudentSpecification.hasStatus(StudentStatus.ACTIVE))
+				.and(StudentSpecification.hasGender(filter.getGender()))
+				.and(StudentSpecification.hasBloodGroup(filter.getBloodGroup()))
+				.and(StudentSpecification.hasCity(filter.getCity()));
+
+		Page<Student> students = studentRepository.findAll(specification, pageable);
 
 		return students.map(studentMapper::toResponse);
 	}

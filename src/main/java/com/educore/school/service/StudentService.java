@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.educore.school.dto.request.StudentRequestDto;
 import com.educore.school.dto.response.StudentResponseDto;
+import com.educore.school.specification.StudentFilterDto;
 
 public interface StudentService {
 
@@ -23,5 +24,7 @@ public interface StudentService {
 	Page<StudentResponseDto> getAllStudents(Pageable pageable);
 
 	Page<StudentResponseDto> searchStudents(String keyword, Pageable pageable);
+
+	Page<StudentResponseDto> filterStudents(StudentFilterDto filter, Pageable pageable);
 
 }
